@@ -111,7 +111,7 @@ public sealed class FileOperationsUtil : IFileOperationsUtil
 
             string html = await _fileUtil.Read(htmlFile, cancellationToken: cancellationToken);
             IDocument document = await parser.ParseDocumentAsync(html, cancellationToken);
-            IHtmlCollection<IElement> previews = document.QuerySelectorAll("div[data-slot=\"preview\"], div[data-code-block-content=\"true\"]");
+            IHtmlCollection<IElement> previews = document.QuerySelectorAll("div[data-slot=\"preview\"], div[class*=\"HeroCodeBlock_HeroContainer\"]");
 
             if (previews.Length == 0)
                 continue;
