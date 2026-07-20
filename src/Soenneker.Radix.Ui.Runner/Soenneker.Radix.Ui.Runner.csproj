@@ -26,6 +26,6 @@
         <PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.10" />
         <PackageReference Include="Soenneker.Managers.Runners" Version="4.0.2278" />
         <PackageReference Include="Soenneker.Playwrights.Crawler" Version="4.0.149" />
-        <PackageReference Include="Soenneker.Utils.File.Download" Version="4.0.1657" />
+        <PackageReference Include="Soenneker.Utils.File.Download" Version="4.0.1658" />
     </ItemGroup>
 </Project>
