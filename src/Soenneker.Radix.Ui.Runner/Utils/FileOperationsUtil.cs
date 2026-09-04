@@ -21,6 +21,7 @@ using Soenneker.Utils.Path.Abstract;
 
 namespace Soenneker.Radix.Ui.Runner.Utils;
 
+/// <inheritdoc cref="IFileOperationsUtil" />
 public sealed class FileOperationsUtil : IFileOperationsUtil
 {
     private readonly ILogger<FileOperationsUtil> _logger;
