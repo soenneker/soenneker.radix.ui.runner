@@ -28,4 +28,8 @@
         <PackageReference Include="Soenneker.Playwrights.Crawler" Version="4.0.274" />
         <PackageReference Include="Soenneker.Utils.File.Download" Version="4.0.1770" />
     </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="Soenneker.Enums.DeployEnvironment" Version="4.0.242" />
+        <PackageReference Include="Soenneker.Extensions.ValueTask" Version="4.0.123" />
+    </ItemGroup>
 </Project>
