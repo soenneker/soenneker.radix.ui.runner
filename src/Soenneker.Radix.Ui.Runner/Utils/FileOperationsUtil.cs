@@ -21,7 +21,6 @@ using Soenneker.Utils.Path.Abstract;
 
 namespace Soenneker.Radix.Ui.Runner.Utils;
 
-/// <inheritdoc cref="IFileOperationsUtil" />
 public sealed class FileOperationsUtil : IFileOperationsUtil
 {
     private readonly ILogger<FileOperationsUtil> _logger;
@@ -57,10 +56,10 @@ public sealed class FileOperationsUtil : IFileOperationsUtil
             await CloneRepository(Constants.ComponentsRepository, componentsRepositoryDirectory, cancellationToken);
 
             await Crawl(crawlDirectory, cancellationToken);
-            await ReplaceRepositoryContents(crawledRepositoryDirectory, crawlDirectory, cancellationToken);
-            await CommitAndPush(crawledRepositoryDirectory, cancellationToken);
             await ExtractComponentFamilies(crawlDirectory, extractedDirectory, cancellationToken);
+            await ReplaceRepositoryContents(crawledRepositoryDirectory, crawlDirectory, cancellationToken);
             await ReplaceRepositoryContents(componentsRepositoryDirectory, extractedDirectory, cancellationToken);
+            await CommitAndPush(crawledRepositoryDirectory, cancellationToken);
             await CommitAndPush(componentsRepositoryDirectory, cancellationToken);
         }
         finally
@@ -120,6 +119,7 @@ public sealed class FileOperationsUtil : IFileOperationsUtil
 
         var parser = new HtmlParser();
         var formatter = new PrettyMarkupFormatter();
+        int familiesSaved = 0;
 
         List<string> htmlFiles = await _directoryUtil.GetFilesByExtension(componentsRoot, ".html", true, cancellationToken);
 
@@ -129,7 +129,7 @@ public sealed class FileOperationsUtil : IFileOperationsUtil
 
             string html = await _fileUtil.Read(htmlFile, cancellationToken: cancellationToken);
             IDocument document = await parser.ParseDocumentAsync(html, cancellationToken);
-            IHtmlCollection<IElement> previews = document.QuerySelectorAll("div[data-slot=\"preview\"], div[class*=\"HeroCodeBlock_HeroContainer\"]");
+            IHtmlCollection<IElement> previews = document.QuerySelectorAll("div[data-slot=\"preview\"], div[class*=\"HeroCodeBlock_HeroContainer\"], div[class*=\"hero-code-block-module__\"][class*=\"__HeroContainer\"]");
 
             if (previews.Length == 0)
                 continue;
@@ -154,8 +154,14 @@ public sealed class FileOperationsUtil : IFileOperationsUtil
             builder.AppendLine("</html>");
 
             await _fileUtil.Write(outputPath, builder.ToString().TrimEnd() + Environment.NewLine, cancellationToken: cancellationToken);
+            familiesSaved++;
             _logger.LogInformation("Saved {Count} component blocks to {Path}", previews.Length, outputPath);
         }
+
+        if (familiesSaved == 0)
+            throw new InvalidOperationException(
+                "No Radix component previews were found in the crawled HTML. " +
+                "The preview markup may have changed; neither generated repository will be replaced or pushed.");
     }
 
     private async ValueTask ReplaceRepositoryContents(string repositoryDirectory, string sourceDirectory, CancellationToken cancellationToken)
